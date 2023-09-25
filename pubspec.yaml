@@ -1,7 +1,7 @@
 name: image_field
 description: Flutter package enable users to add Image field in form with upload functionality locally or remotly.
 version: 0.0.1
-homepage:
+homepage: https://github.com/mattar88/flutter_image_field
 
 environment:
   sdk: '>=2.19.5 <3.0.0'
