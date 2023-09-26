@@ -77,13 +77,13 @@ class ImageField extends StatefulWidget {
   /// Height of the image in the listview
   double height;
 
-  ///Enable user to pick multiple file
+  ///Enable user to pick multiple files
   bool multipleUpload;
 
   ///Enable user to scroll listview to the end to see uploaded file
   bool scrollingAfterUpload;
 
-  ///Number of the files can upload
+  ///Maximum number of files that can be uploaded.
   int? cardinality;
 
   /// Padding of the listview page of files
@@ -97,7 +97,7 @@ class ImageField extends StatefulWidget {
   ///Note: if True should implement onUpload function
   bool remoteImage;
 
-  ///[texts] key/value variable used for localizations or to override
+  ///[texts] key/value variable used for localizations and to override
   ///the defaults texts used by the Imagefield.
   Map<String, String>? texts;
 
@@ -115,8 +115,8 @@ class ImageField extends StatefulWidget {
       LPI.ControllerLinearProgressIndicator?
           controllerLinearProgressIndicator)? onUpload;
 
-  /// Its a hook function used to alter the widget of the field(Thumbnail List)
-  /// in the form before render it
+  /// It's a hook function used to alter the widget of the field(Thumbnail List)
+  /// in the form before rendering it
   final Widget Function(
           List<ImageAndCaptionModel>? defaultFiles, Widget fieldForm)?
       alterFieldForm;
