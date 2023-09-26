@@ -84,7 +84,7 @@ class _UploadLocalImageFormState extends State<UploadLocalImageForm> {
 }
 ```
 
- <h6>You can use   ```ImageField()```   for upload to a server by following the example below:</h6>
+</br>You can use   ``` ImageField() ```   for upload to a server by following the example below:
 
 ```
 
