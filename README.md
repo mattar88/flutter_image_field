@@ -1,8 +1,8 @@
-# flutter_image_field
+# flutter image field
 Flutter package enables users to add Image field in form with upload functionality locally or remotely.
 
 ### Screenshot
-<img src="https://raw.githubusercontent.com/mattar88/flutter_image_field/raw/master/example/screenshots/tutorial1.gif" width="255" hspace="4">
+<img src="https://raw.githubusercontent.com/mattar88/flutter_image_field/master/example/screenshots/tutorial1.gif" width="255" hspace="4">
 
 ### Features
 <ul dir="auto">
