@@ -29,7 +29,7 @@ $ flutter pub add image_field
 This will add a line like this to you package's pubspec.yaml (and run an implicit `dart pub get`):
 ```
 dependencies:
-  image_field: ^0.0.1
+  image_field: ^0.0.2
 ```
 2.Implementation
 </br>You can use   ``` ImageField() ```   for upload to a server by following the example below:
