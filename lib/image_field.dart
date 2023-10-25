@@ -34,12 +34,10 @@ class ImageField extends StatefulWidget {
       this.height = 75,
       this.thumbnailHeight = 75,
       this.thumbnailWidth = 75,
+      this.thumbnailAddMoreDecoration,
       this.listPadding = const EdgeInsets.all(2),
-      this.label = const Padding(
-        child: Icon(Icons.image),
-        padding: EdgeInsets.only(right: 10),
-      ),
-      this.pickerIconColor,
+      this.label,
+      this.pickerIconColor = Colors.white,
       this.scrollingAfterUpload = true,
       this.multipleUpload = true,
       this.cardinality,
@@ -70,6 +68,9 @@ class ImageField extends StatefulWidget {
 
   /// Height of the small image shown in the field
   double thumbnailHeight;
+
+  /// Uses for styling the button add more on thumbnail list
+  BoxDecoration? thumbnailAddMoreDecoration;
 
   ///Width of the image in the listview
   double? width;
@@ -150,6 +151,25 @@ class _ImageFieldState extends State<ImageField> {
     }
   }
 
+  void _gotoImageList() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => ImageListActions(
+              pickerIconColor: widget.pickerIconColor,
+              listPadding: widget.listPadding,
+              fileList: widget.defaultFiles ?? [],
+              onSave: widget.onSave,
+              onUpload: widget.onUpload,
+              scrollingAfterUpload: widget.scrollingAfterUpload,
+              multipleUpload: widget.multipleUpload,
+              getText: getText,
+              remoteImage: widget.remoteImage,
+              cardinality: widget.cardinality,
+              refresh: refresh)),
+    );
+  }
+
   Widget _previewImages() {
     var placeholderImage = Semantics(
         label: 'image_placeholder',
@@ -217,18 +237,25 @@ class _ImageFieldState extends State<ImageField> {
                   alignment: AlignmentDirectional.center,
                   children: [
                     img,
-                    Row(children: [
-                      const Icon(
-                        Icons.add_box_rounded,
-                        size: 30,
-                      ),
-                      if (isMore != 0)
-                        Text(
-                          '${isMore}',
-                          style: TextStyle(
-                              fontSize: 25, fontWeight: FontWeight.bold),
-                        )
-                    ]),
+                    Container(
+                      height: widget.thumbnailHeight,
+                      width: widget.thumbnailWidth,
+                      color: Colors.black.withOpacity(0.4),
+                      child: (isMore != 0)
+                          ? Center(
+                              child: Text(
+                              '+${isMore}',
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 27,
+                                  fontWeight: FontWeight.normal),
+                            ))
+                          : const Icon(
+                              color: Colors.white,
+                              Icons.add,
+                              size: 40,
+                            ),
+                    ),
                   ],
                 ));
                 break;
@@ -241,54 +268,52 @@ class _ImageFieldState extends State<ImageField> {
 
                     // margin: const EdgeInsets.all(15.0),
                     // padding: const EdgeInsets.all(3.0),
-                    decoration: BoxDecoration(
-                        border: Border.all(),
-                        borderRadius: const BorderRadius.only(
-                            topRight: Radius.circular(5),
-                            bottomRight: Radius.circular(5))),
-                    child: Icon(
-                      Icons.add_box_rounded,
-                      size: 50,
+                    decoration: widget.thumbnailAddMoreDecoration ??
+                        BoxDecoration(
+                            border: Border.all(
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                            borderRadius: const BorderRadius.only(
+                                topRight: Radius.circular(5),
+                                bottomRight: Radius.circular(5))),
+                    child: const Icon(
+                      Icons.add,
+                      size: 40,
                     ),
                   ));
                 }
               }
             }
 
-            Widget fieldForm = (widget.defaultFiles == null ||
-                    widget.defaultFiles!.isEmpty)
-                ? Container(
-                    width: constraints.constrainWidth(),
+            Widget fieldForm =
+                (widget.defaultFiles == null || widget.defaultFiles!.isEmpty)
+                    ? Container(
+                        width: constraints.constrainWidth(),
 
-                    // margin: const EdgeInsets.all(15.0),
-                    padding: const EdgeInsets.all(3.0),
-                    decoration: BoxDecoration(
-                        border: Border.all(),
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(2))),
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.upload),
-                          Text(getText('fieldFormText'))
-                        ]),
-                  )
-                : Container(
-                    // padding: EdgeInsets.all(5),
-                    width: constraints.constrainWidth(),
-                    height: widget.height,
-                    // decoration: BoxDecoration(
-                    //   border: Border.all(),
-                    // ),
-                    child: Row(children: listFiles)
+                        // margin: const EdgeInsets.all(15.0),
+                        // padding: const EdgeInsets.all(3.0),
 
-                    //  ListView.builder(
-                    //     scrollDirection: Axis.horizontal,
-                    //     shrinkWrap: true,
-                    //     key: UniqueKey(),
-                    //     itemCount: widget.defaultFiles!.length,
-                    //     itemBuilder: (BuildContext context, int index) {})
-                    );
+                        child: ElevatedButton.icon(
+                          onPressed: _gotoImageList,
+                          icon: const Icon(Icons.upload),
+                          label: Text(getText('fieldFormText')),
+                          style: ElevatedButton.styleFrom(
+                              textStyle: TextStyle(fontSize: 15),
+                              shape: const RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(12)))),
+                        ),
+                      )
+                    : GestureDetector(
+                        onTap: _gotoImageList,
+                        child: Container(
+                            // padding: EdgeInsets.all(5),
+                            width: constraints.constrainWidth(),
+                            height: widget.height,
+                            child: Row(children: listFiles)));
 
             if (widget.alterFieldForm != null) {
               fieldForm =
@@ -296,28 +321,7 @@ class _ImageFieldState extends State<ImageField> {
             }
 
             field.add(Semantics(
-                label: 'image_picker_picked_images',
-                child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ImageListActions(
-                                pickerIconColor: widget.pickerIconColor,
-                                listPadding: widget.listPadding,
-                                fileList: widget.defaultFiles ?? [],
-                                onSave: widget.onSave,
-                                onUpload: widget.onUpload,
-                                scrollingAfterUpload:
-                                    widget.scrollingAfterUpload,
-                                multipleUpload: widget.multipleUpload,
-                                getText: getText,
-                                remoteImage: widget.remoteImage,
-                                cardinality: widget.cardinality,
-                                refresh: refresh)),
-                      );
-                    },
-                    child: fieldForm)));
+                label: 'image_picker_picked_images', child: fieldForm));
 
             return Row(children: field);
           })),
@@ -415,13 +419,13 @@ class _ImageAndCaptionListWidgetState extends State<ImageAndCaptionListWidget> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
 
-    log('Lengthhhhh...${widget.fileList!.length}');
     if (widget.fileList!.isEmpty) {
-      return Center(
-          child: Text(
+      return Expanded(
+          child: Center(
+              child: Text(
         widget.getText('emptyDataText'),
         textAlign: TextAlign.center,
-      ));
+      )));
     }
 
     List<Widget> imgs = [];
@@ -458,8 +462,6 @@ class _ImageAndCaptionListWidgetState extends State<ImageAndCaptionListWidget> {
                                         fit: BoxFit.cover,
                                         progressIndicatorBuilder:
                                             (context, url, downloadProgress) {
-                                          // log('maxscrolling: ${_scrollController}');
-                                          // log('Progress bar.....');
                                           _scrollAfterUpload(reset: true);
 
                                           return placeholderImage;
@@ -608,7 +610,7 @@ class _ImageListActionsState extends State<ImageListActions> {
   void _setFileListFromfileListUploaded(dynamic fileListUploaded) {
     pickedFiles = true;
     fileListUploaded.forEach((fileUploaded) {
-      widget.fileList!
+      widget.fileList
           .add(ImageAndCaptionModel(file: fileUploaded, caption: ''));
     });
   }
@@ -634,11 +636,9 @@ class _ImageListActionsState extends State<ImageListActions> {
               // maxHeight: maxHeight,
               // imageQuality: quality,
               );
-          log('Multiple image upload: ${pickedFileList.length}');
+
           if (pickedFileList.isNotEmpty) {
             try {
-              log('pickedFileList.111...........');
-
               setState(() {
                 isLoading = true;
                 // isLocalLoading = true;
@@ -759,8 +759,8 @@ class _ImageListActionsState extends State<ImageListActions> {
         widget.cardinality! <= widget.fileList!.length);
 
     var bgColor = isLoading || cardinalityExceeded
-        ? Theme.of(context).colorScheme.primaryContainer
-        : Theme.of(context).colorScheme.primaryContainer.withOpacity(0.5);
+        ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.5)
+        : Theme.of(context).colorScheme.primaryContainer;
     final IconThemeData iconTheme = IconTheme.of(context);
     Color? iconColor = widget.pickerIconColor ?? iconTheme.color;
     Color? pickerIconColor = isLoading || cardinalityExceeded
@@ -843,7 +843,7 @@ class _ImageListActionsState extends State<ImageListActions> {
     final AppBarTheme appBarTheme = AppBarTheme.of(context);
 
     final DefaultTextStyle defaultTextStyle = DefaultTextStyle.of(context);
-    log('helooooo ${theme.menuTheme}');
+
     return WillPopScope(
         onWillPop: () async {
           if (widget.onSave != null) {
@@ -856,23 +856,38 @@ class _ImageListActionsState extends State<ImageListActions> {
           appBar: AppBar(
             title: Text(widget.getText('titleText')),
             actions: [
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  elevation: 0,
-                  side: const BorderSide(width: 0, color: Colors.transparent),
-                ),
-                onPressed: () {
-                  if (widget.onSave != null) {
-                    widget.onSave!(widget.fileList);
-                  }
-                  widget.refresh();
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  widget.getText('doneText'),
-                  // style: TextStyle(color: ),
-                ),
-              )
+              Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 1),
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                      elevation: MaterialStateProperty.all(0),
+                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                        (Set<MaterialState> states) {
+                          if (states.contains(MaterialState.pressed))
+                            return Colors.transparent;
+                          return Colors
+                              .transparent; // Use the component's default.
+                        },
+                      ),
+                    ),
+
+                    // ElevatedButton.styleFrom(
+                    //   elevation: 0,
+                    //   side:
+                    //       const BorderSide(width: 0, color: Colors.transparent),
+                    // ),
+                    onPressed: () {
+                      if (widget.onSave != null) {
+                        widget.onSave!(widget.fileList);
+                      }
+                      widget.refresh();
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      widget.getText('doneText'),
+                      // style: TextStyle(color: ),
+                    ),
+                  ))
             ],
           ),
           body: Container(
