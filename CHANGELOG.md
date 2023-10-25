@@ -13,3 +13,7 @@
 ## 0.0.4
 
 * Solving problems and update colors
+
+## 0.0.5
+
+* Update Readme
