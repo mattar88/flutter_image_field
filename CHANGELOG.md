@@ -9,3 +9,7 @@
 ## 0.0.3
 
 * Update widgets and improve code
+
+## 0.0.4
+
+* Solving problems and update colors

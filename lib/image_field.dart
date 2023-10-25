@@ -31,13 +31,14 @@ class ImageField extends StatefulWidget {
       this.texts,
       this.thumbnailCount = 3,
       this.width,
-      this.height = 75,
-      this.thumbnailHeight = 75,
-      this.thumbnailWidth = 75,
+      this.height = 90,
+      this.thumbnailHeight = 90,
+      this.thumbnailWidth = 90,
       this.thumbnailAddMoreDecoration,
       this.listPadding = const EdgeInsets.all(2),
       this.label,
-      this.pickerIconColor = Colors.white,
+      this.pickerIconColor,
+      this.pickerBackgroundColor,
       this.scrollingAfterUpload = true,
       this.multipleUpload = true,
       this.cardinality,
@@ -93,6 +94,10 @@ class ImageField extends StatefulWidget {
   /// Icon color of the buttons that used to upload files
   /// that exist in the listview page
   Color? pickerIconColor;
+
+  /// Background color of the buttons that used to upload files
+  /// that exist in the listview page
+  Color? pickerBackgroundColor;
 
   ///Used for remote upload image
   ///Note: if True should implement onUpload function
@@ -157,6 +162,7 @@ class _ImageFieldState extends State<ImageField> {
       MaterialPageRoute(
           builder: (context) => ImageListActions(
               pickerIconColor: widget.pickerIconColor,
+              pickerBackgroundColor: widget.pickerBackgroundColor,
               listPadding: widget.listPadding,
               fileList: widget.defaultFiles ?? [],
               onSave: widget.onSave,
@@ -182,6 +188,11 @@ class _ImageFieldState extends State<ImageField> {
     int isMore = 0;
     bool cardinalityExceeded = (widget.cardinality != null &&
         widget.cardinality! <= widget.defaultFiles!.length);
+
+    Color? addMoreIconColor = Theme.of(context).colorScheme.primaryContainer;
+
+    Color? addMoreBackgroundColor =
+        Theme.of(context).colorScheme.onPrimaryContainer;
 
     return Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -240,18 +251,18 @@ class _ImageFieldState extends State<ImageField> {
                     Container(
                       height: widget.thumbnailHeight,
                       width: widget.thumbnailWidth,
-                      color: Colors.black.withOpacity(0.4),
+                      color: addMoreBackgroundColor.withOpacity(0.6),
                       child: (isMore != 0)
                           ? Center(
                               child: Text(
-                              '+${isMore}',
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 27,
+                              '+$isMore',
+                              style: TextStyle(
+                                  color: addMoreIconColor,
+                                  fontSize: 26,
                                   fontWeight: FontWeight.normal),
                             ))
-                          : const Icon(
-                              color: Colors.white,
+                          : Icon(
+                              color: addMoreIconColor,
                               Icons.add,
                               size: 40,
                             ),
@@ -263,27 +274,42 @@ class _ImageFieldState extends State<ImageField> {
                 listFiles.add(img);
                 if (isLast && !cardinalityExceeded) {
                   listFiles.add(Container(
-                    height: widget.thumbnailHeight,
-                    width: widget.thumbnailWidth,
+                      height: widget.thumbnailHeight,
+                      width: widget.thumbnailWidth,
+                      child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            shape: const RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(2))),
+                          ),
+                          onPressed: _gotoImageList,
+                          child: Icon(
+                            Icons.add,
+                            size: 40,
+                            color: addMoreIconColor,
+                          ))));
+                  // listFiles.add(Container(
+                  //   height: widget.thumbnailHeight,
+                  //   width: widget.thumbnailWidth,
 
-                    // margin: const EdgeInsets.all(15.0),
-                    // padding: const EdgeInsets.all(3.0),
-                    decoration: widget.thumbnailAddMoreDecoration ??
-                        BoxDecoration(
-                            border: Border.all(
-                              color: Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.white
-                                  : Colors.black,
-                            ),
-                            borderRadius: const BorderRadius.only(
-                                topRight: Radius.circular(5),
-                                bottomRight: Radius.circular(5))),
-                    child: const Icon(
-                      Icons.add,
-                      size: 40,
-                    ),
-                  ));
+                  //   // margin: const EdgeInsets.all(15.0),
+                  //   // padding: const EdgeInsets.all(3.0),
+                  //   decoration: widget.thumbnailAddMoreDecoration ??
+                  //       BoxDecoration(
+                  //           border: Border.all(
+                  //             color: Theme.of(context).brightness ==
+                  //                     Brightness.dark
+                  //                 ? Colors.white
+                  //                 : Colors.black,
+                  //           ),
+                  //           borderRadius: const BorderRadius.only(
+                  //               topRight: Radius.circular(5),
+                  //               bottomRight: Radius.circular(5))),
+                  //   child: const Icon(
+                  //     Icons.add,
+                  //     size: 40,
+                  //   ),
+                  // ));
                 }
               }
             }
@@ -553,6 +579,7 @@ class ImageListActions extends StatefulWidget {
       this.remoteImage = true,
       this.multipleUpload = true,
       this.pickerIconColor,
+      this.pickerBackgroundColor,
       this.cardinality,
       this.listPadding = const EdgeInsets.all(0),
       required this.scrollingAfterUpload,
@@ -563,6 +590,7 @@ class ImageListActions extends StatefulWidget {
       required this.fileList});
 
   Color? pickerIconColor;
+  Color? pickerBackgroundColor;
   EdgeInsets listPadding;
   bool remoteImage;
   bool multipleUpload;
@@ -758,15 +786,20 @@ class _ImageListActionsState extends State<ImageListActions> {
     bool cardinalityExceeded = (widget.cardinality != null &&
         widget.cardinality! <= widget.fileList!.length);
 
+    Color? pickerBackgroundColor = widget.pickerBackgroundColor ??
+        Theme.of(context).colorScheme.primaryContainer;
+
     var bgColor = isLoading || cardinalityExceeded
-        ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.5)
-        : Theme.of(context).colorScheme.primaryContainer;
-    final IconThemeData iconTheme = IconTheme.of(context);
-    Color? iconColor = widget.pickerIconColor ?? iconTheme.color;
+        ? pickerBackgroundColor.withOpacity(0.5)
+        : pickerBackgroundColor;
+
+    Color? iconColor = widget.pickerIconColor ??
+        Theme.of(context).colorScheme.onPrimaryContainer;
     Color? pickerIconColor = isLoading || cardinalityExceeded
-        ? iconColor!.withOpacity(0.5)
+        ? iconColor.withOpacity(0.5)
         : iconColor;
 
+    // pickerIconColor = null;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20.0),
       child: Row(
