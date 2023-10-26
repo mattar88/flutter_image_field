@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/material/progress_indicator.dart' as PI;
+import 'package:flutter/src/material/progress_indicator.dart' as pi;
 
 class ControllerLinearProgressIndicator {
   late _LinearProgressIndicatorState? _indicatorProgressState;
@@ -9,9 +9,8 @@ class ControllerLinearProgressIndicator {
     _indicatorProgressState!._updateProgress(uploadProgressPercentage);
   }
 
-  void _attach(_LinearProgressIndicatorState _indicatorProgressState) {
-    //assert(this._indicatorProgressState != null);
-    this._indicatorProgressState = _indicatorProgressState;
+  void _attach(_LinearProgressIndicatorState indicatorProgressState) {
+    _indicatorProgressState = indicatorProgressState;
   }
 
   void _detach() {
@@ -20,12 +19,12 @@ class ControllerLinearProgressIndicator {
 }
 
 class LinearProgressIndicator extends StatefulWidget {
-  double? width = 100;
+  final double width;
 
   final ControllerLinearProgressIndicator? controllerLinearProgressIndicator;
 
-  LinearProgressIndicator(
-      {this.width, this.controllerLinearProgressIndicator, super.key});
+  const LinearProgressIndicator(
+      {required this.width, this.controllerLinearProgressIndicator, super.key});
 
   @override
   State<LinearProgressIndicator> createState() =>
@@ -59,7 +58,7 @@ class _LinearProgressIndicatorState extends State<LinearProgressIndicator> {
         label: 'uploadProgressBar',
         child: SizedBox(
           width: widget.width,
-          child: PI.LinearProgressIndicator(
+          child: pi.LinearProgressIndicator(
             minHeight: 5,
             value: percentageProgress,
           ),

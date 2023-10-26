@@ -17,3 +17,7 @@
 ## 0.0.5
 
 * Update Readme
+
+## 0.0.6
+
+* Improve code

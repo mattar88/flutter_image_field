@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_field/image_field.dart';
-import 'package:image_field/linear_progress_Indicator.dart';
 import 'package:image_picker/image_picker.dart';
 
 void main() {
@@ -122,23 +121,21 @@ class _MyHomePageState extends State<MyHomePage> {
                       'fieldFormText': 'Upload to server',
                       'titleText': 'Upload to server'
                     },
-                    defaultFiles: remoteFiles != null
+                    files: remoteFiles != null
                         ? remoteFiles!.map((image) {
                             return ImageAndCaptionModel(
                                 file: image, caption: image.alt.toString());
                           }).toList()
                         : [],
                     remoteImage: true,
-                    onUpload: (dynamic pickedFile,
-                        ControllerLinearProgressIndicator?
-                            controllerLinearProgressIndicator) async {
+                    onUpload:
+                        (pickedFile, controllerLinearProgressIndicator) async {
                       dynamic fileUploaded = await uploadToServer(
                         pickedFile,
                         uploadProgress: (percent) {
                           var uploadProgressPercentage = percent / 100;
                           controllerLinearProgressIndicator!
                               .updateProgress(uploadProgressPercentage);
-                          print('Progress bar: ${percent.toInt()}');
                         },
                       );
                       return fileUploaded;

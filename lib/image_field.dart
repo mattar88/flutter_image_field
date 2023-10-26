@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,25 +6,12 @@ import 'package:flutter/scheduler.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:skeletons/skeletons.dart';
-import 'package:image_field/linear_progress_Indicator.dart' as LPI;
+import 'package:image_field/linear_progress_indicator.dart' as lpi;
 
 class ImageField extends StatefulWidget {
-  static final Map<String, String> _defaultTexts = {
-    'title': 'Upload Image',
-    'imagePickerFromGalleryTooltipText': 'Pick Image from gallery',
-    'multipleImagePickerFromGalleryTooltipText':
-        'Pick Multiple Image from gallery',
-    'takePhotoText': 'Take a photo',
-    'addCaptionText': 'Add a caption...',
-    'doneText': 'Done',
-    'titleText': 'Upload',
-    'fieldFormText': 'Upload',
-    'emptyDataText': 'Empty data',
-  };
-
-  ImageField(
+  const ImageField(
       {super.key,
-      this.defaultFiles,
+      this.files,
       this.remoteImage = false,
       this.texts,
       this.thumbnailCount = 3,
@@ -48,64 +33,61 @@ class ImageField extends StatefulWidget {
       : assert(
           (remoteImage == true && onUpload != null) || (remoteImage == false),
           'You should implement onUpload() function when remoteImage argument is true',
-        ) {
-    defaultFiles = defaultFiles ?? [];
-    texts = {..._defaultTexts, ...?texts};
-  }
+        );
 
   ///
-  /// [defaultFiles] used to add default images on load
+  /// [files] used to add default images on load
   ///
-  List<ImageAndCaptionModel>? defaultFiles;
+  final List<ImageAndCaptionModel>? files;
 
   /// label of field
-  Widget? label;
+  final Widget? label;
 
   /// Number of images shown in the field
-  int thumbnailCount;
+  final int thumbnailCount;
 
   /// Width of the small image shown in the field
-  double thumbnailWidth;
+  final double thumbnailWidth;
 
   /// Height of the small image shown in the field
-  double thumbnailHeight;
+  final double thumbnailHeight;
 
   /// Uses for styling the button add more on thumbnail list
-  BoxDecoration? thumbnailAddMoreDecoration;
+  final BoxDecoration? thumbnailAddMoreDecoration;
 
   ///Width of the image in the listview
-  double? width;
+  final double? width;
 
   /// Height of the image in the listview
-  double height;
+  final double height;
 
   ///Enable user to pick multiple files
-  bool multipleUpload;
+  final bool multipleUpload;
 
   ///Enable user to scroll listview to the end to see uploaded file
-  bool scrollingAfterUpload;
+  final bool scrollingAfterUpload;
 
   ///Maximum number of files that can be uploaded.
-  int? cardinality;
+  final int? cardinality;
 
   /// Padding of the listview page of files
-  EdgeInsets listPadding;
+  final EdgeInsets listPadding;
 
   /// Icon color of the buttons that used to upload files
   /// that exist in the listview page
-  Color? pickerIconColor;
+  final Color? pickerIconColor;
 
   /// Background color of the buttons that used to upload files
   /// that exist in the listview page
-  Color? pickerBackgroundColor;
+  final Color? pickerBackgroundColor;
 
   ///Used for remote upload image
   ///Note: if True should implement onUpload function
-  bool remoteImage;
+  final bool remoteImage;
 
   ///[texts] key/value variable used for localizations and to override
-  ///the defaults texts used by the Imagefield.
-  Map<String, String>? texts;
+  ///the defaults texts used by the ImageFieldText.
+  final Map<String, String>? texts;
 
   ///
   ///This function has [dataSource] image that uploaded by user
@@ -118,7 +100,7 @@ class ImageField extends StatefulWidget {
   ///
   final dynamic Function(
       dynamic dataSource,
-      LPI.ControllerLinearProgressIndicator?
+      lpi.ControllerLinearProgressIndicator?
           controllerLinearProgressIndicator)? onUpload;
 
   /// It's a hook function used to alter the widget of the field(Thumbnail List)
@@ -135,7 +117,33 @@ class ImageField extends StatefulWidget {
   State<ImageField> createState() => _ImageFieldState();
 }
 
+final Map<String, String> defaultTexts = {
+  'title': 'Upload Image',
+  'imagePickerFromGalleryTooltipText': 'Pick Image from gallery',
+  'multipleImagePickerFromGalleryTooltipText':
+      'Pick Multiple Image from gallery',
+  'takePhotoText': 'Take a photo',
+  'addCaptionText': 'Add a caption...',
+  'doneText': 'Done',
+  'titleText': 'Upload',
+  'fieldFormText': 'Upload',
+  'emptyDataText': 'Empty data',
+};
+
 class _ImageFieldState extends State<ImageField> {
+  Map<String, String>? texts;
+  List<ImageAndCaptionModel>? files;
+  @override
+  void initState() {
+    files = widget.files ?? [];
+
+    texts = widget.texts != null
+        ? {...defaultTexts, ...?widget.texts}
+        : defaultTexts;
+
+    super.initState();
+  }
+
   @override
   void deactivate() {
     super.deactivate();
@@ -147,7 +155,7 @@ class _ImageFieldState extends State<ImageField> {
   }
 
   String getText(String key) {
-    return widget.texts![key] ?? '';
+    return texts![key] ?? '';
   }
 
   void refresh() {
@@ -164,7 +172,7 @@ class _ImageFieldState extends State<ImageField> {
               pickerIconColor: widget.pickerIconColor,
               pickerBackgroundColor: widget.pickerBackgroundColor,
               listPadding: widget.listPadding,
-              fileList: widget.defaultFiles ?? [],
+              fileList: files!,
               onSave: widget.onSave,
               onUpload: widget.onUpload,
               scrollingAfterUpload: widget.scrollingAfterUpload,
@@ -186,8 +194,8 @@ class _ImageFieldState extends State<ImageField> {
 
     List<Widget> field = [];
     int isMore = 0;
-    bool cardinalityExceeded = (widget.cardinality != null &&
-        widget.cardinality! <= widget.defaultFiles!.length);
+    bool cardinalityExceeded =
+        (widget.cardinality != null && widget.cardinality! <= files!.length);
 
     Color? addMoreIconColor = Theme.of(context).colorScheme.primaryContainer;
 
@@ -204,28 +212,27 @@ class _ImageFieldState extends State<ImageField> {
             width ??= constraints.constrainWidth();
             int screenMaxCount = (width / widget.thumbnailWidth).floor();
 
-            var index = 0;
             List<Widget> listFiles = [];
-            for (int i = 0; i < widget.defaultFiles!.length; i++) {
-              bool isLast = i == widget.defaultFiles!.length - 1;
-              isMore = i == screenMaxCount - 1 &&
-                      widget.defaultFiles!.length >= screenMaxCount
-                  ? widget.defaultFiles!.length - screenMaxCount
-                  : -1;
+            for (int i = 0; i < files!.length; i++) {
+              bool isLast = i == files!.length - 1;
+              isMore =
+                  i == screenMaxCount - 1 && files!.length >= screenMaxCount
+                      ? files!.length - screenMaxCount
+                      : -1;
               var img = Semantics(
                   label: 'image_picker_example_picked_image',
                   child: widget.remoteImage
                       ? CachedNetworkImage(
                           height: widget.thumbnailHeight,
                           width: widget.thumbnailWidth,
-                          imageUrl: widget.defaultFiles![i].file.uri.toString(),
+                          imageUrl: files![i].file.uri.toString(),
                           fit: BoxFit.cover,
                           progressIndicatorBuilder:
                               (context, url, downloadProgress) {
                             return placeholderImage;
                           },
                           errorWidget: (context, url, error) =>
-                              Icon(Icons.error),
+                              const Icon(Icons.error),
                         )
                       : Image(
                           height: widget.thumbnailHeight,
@@ -240,7 +247,7 @@ class _ImageFieldState extends State<ImageField> {
                             );
                           }),
                           image: MemoryImage(
-                            widget.defaultFiles![i].file,
+                            files![i].file,
                           )));
 
               if (isMore != -1) {
@@ -273,7 +280,7 @@ class _ImageFieldState extends State<ImageField> {
               } else {
                 listFiles.add(img);
                 if (isLast && !cardinalityExceeded) {
-                  listFiles.add(Container(
+                  listFiles.add(SizedBox(
                       height: widget.thumbnailHeight,
                       width: widget.thumbnailWidth,
                       child: OutlinedButton(
@@ -288,62 +295,34 @@ class _ImageFieldState extends State<ImageField> {
                             size: 40,
                             color: addMoreIconColor,
                           ))));
-                  // listFiles.add(Container(
-                  //   height: widget.thumbnailHeight,
-                  //   width: widget.thumbnailWidth,
-
-                  //   // margin: const EdgeInsets.all(15.0),
-                  //   // padding: const EdgeInsets.all(3.0),
-                  //   decoration: widget.thumbnailAddMoreDecoration ??
-                  //       BoxDecoration(
-                  //           border: Border.all(
-                  //             color: Theme.of(context).brightness ==
-                  //                     Brightness.dark
-                  //                 ? Colors.white
-                  //                 : Colors.black,
-                  //           ),
-                  //           borderRadius: const BorderRadius.only(
-                  //               topRight: Radius.circular(5),
-                  //               bottomRight: Radius.circular(5))),
-                  //   child: const Icon(
-                  //     Icons.add,
-                  //     size: 40,
-                  //   ),
-                  // ));
                 }
               }
             }
 
-            Widget fieldForm =
-                (widget.defaultFiles == null || widget.defaultFiles!.isEmpty)
-                    ? Container(
+            Widget fieldForm = (files == null || files!.isEmpty)
+                ? SizedBox(
+                    width: constraints.constrainWidth(),
+                    child: ElevatedButton.icon(
+                      onPressed: _gotoImageList,
+                      icon: const Icon(Icons.upload),
+                      label: Text(getText('fieldFormText')),
+                      style: ElevatedButton.styleFrom(
+                          textStyle: const TextStyle(fontSize: 15),
+                          shape: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(12)))),
+                    ),
+                  )
+                : GestureDetector(
+                    onTap: _gotoImageList,
+                    child: SizedBox(
+                        // padding: EdgeInsets.all(5),
                         width: constraints.constrainWidth(),
-
-                        // margin: const EdgeInsets.all(15.0),
-                        // padding: const EdgeInsets.all(3.0),
-
-                        child: ElevatedButton.icon(
-                          onPressed: _gotoImageList,
-                          icon: const Icon(Icons.upload),
-                          label: Text(getText('fieldFormText')),
-                          style: ElevatedButton.styleFrom(
-                              textStyle: TextStyle(fontSize: 15),
-                              shape: const RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(12)))),
-                        ),
-                      )
-                    : GestureDetector(
-                        onTap: _gotoImageList,
-                        child: Container(
-                            // padding: EdgeInsets.all(5),
-                            width: constraints.constrainWidth(),
-                            height: widget.height,
-                            child: Row(children: listFiles)));
+                        height: widget.height,
+                        child: Row(children: listFiles)));
 
             if (widget.alterFieldForm != null) {
-              fieldForm =
-                  widget.alterFieldForm!(widget.defaultFiles, fieldForm);
+              fieldForm = widget.alterFieldForm!(files, fieldForm);
             }
 
             field.add(Semantics(
@@ -371,13 +350,14 @@ class ImageAndCaptionModel {
 }
 
 class ImageAndCaptionListWidget extends StatefulWidget {
-  List<ImageAndCaptionModel>? fileList = [];
+  final List<ImageAndCaptionModel>? fileList;
   final String Function(String) getText;
-  bool remoteImage;
-  bool scrollingAfterUpload;
+  final bool remoteImage;
+  final bool scrollingAfterUpload;
   final void Function() notifyParent;
-  EdgeInsets listPadding;
-  ImageAndCaptionListWidget(
+  final EdgeInsets listPadding;
+
+  const ImageAndCaptionListWidget(
     this.fileList,
     this.getText, {
     this.listPadding = const EdgeInsets.all(0),
@@ -394,11 +374,11 @@ class ImageAndCaptionListWidget extends StatefulWidget {
 
 class _ImageAndCaptionListWidgetState extends State<ImageAndCaptionListWidget> {
   bool newItemAdd = false;
-  LPI.ControllerLinearProgressIndicator? controllerLinearProgressIndicator;
+  lpi.ControllerLinearProgressIndicator? controllerLinearProgressIndicator;
 
-  final GlobalKey<FormState> imageFieldFormKey =
-      GlobalKey<FormState>(debugLabel: '__imageField__');
-  ScrollController _scrollController = new ScrollController();
+  final GlobalKey<FormState> imageFieldTextFormKey =
+      GlobalKey<FormState>(debugLabel: '__ImageFieldText__');
+
   final ItemScrollController itemScrollController = ItemScrollController();
   final ScrollOffsetController scrollOffsetController =
       ScrollOffsetController();
@@ -419,7 +399,6 @@ class _ImageAndCaptionListWidgetState extends State<ImageAndCaptionListWidget> {
   void didUpdateWidget(covariant ImageAndCaptionListWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (listLength < oldWidget.fileList!.length) {
-      log('Enter new item ');
       newItemAdd = true;
       _scrollAfterUpload();
     }
@@ -432,7 +411,7 @@ class _ImageAndCaptionListWidgetState extends State<ImageAndCaptionListWidget> {
         if (newItemAdd) {
           itemScrollController.scrollTo(
               index: widget.fileList!.length - 1,
-              duration: Duration(milliseconds: 500),
+              duration: const Duration(milliseconds: 500),
               curve: Curves.easeInOutCubic);
 
           if (reset) newItemAdd = false;
@@ -465,99 +444,95 @@ class _ImageAndCaptionListWidgetState extends State<ImageAndCaptionListWidget> {
                 width: screenWidth)));
 
     for (var imageAndCaption in widget.fileList!) {
-      // _controllers.addAll({imageAndCaption.hashCode: TextEditingController()});
       imgs.insert(
           imgs.length,
           Column(
             children: [
               Container(
-                child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    child: Semantics(
-                        label: 'image_picker',
-                        child: SizedBox(
-                            width: screenWidth,
-                            // height: 100,
-                            child: Stack(
-                              alignment: Alignment.topRight,
-                              children: [
-                                widget.remoteImage
-                                    ? CachedNetworkImage(
-                                        imageUrl:
-                                            imageAndCaption.file.uri.toString(),
-                                        fit: BoxFit.cover,
-                                        progressIndicatorBuilder:
-                                            (context, url, downloadProgress) {
-                                          _scrollAfterUpload(reset: true);
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Semantics(
+                      label: 'image_picker',
+                      child: SizedBox(
+                          width: screenWidth,
+                          // height: 100,
+                          child: Stack(
+                            alignment: Alignment.topRight,
+                            children: [
+                              widget.remoteImage
+                                  ? CachedNetworkImage(
+                                      imageUrl:
+                                          imageAndCaption.file.uri.toString(),
+                                      fit: BoxFit.cover,
+                                      progressIndicatorBuilder:
+                                          (context, url, downloadProgress) {
+                                        _scrollAfterUpload(reset: true);
 
-                                          return placeholderImage;
-                                        },
-                                        errorWidget: (context, url, error) =>
-                                            Icon(Icons.error),
-                                      )
-                                    : Image(
-                                        frameBuilder: ((context, child, frame,
-                                            wasSynchronouslyLoaded) {
-                                          if (wasSynchronouslyLoaded)
-                                            return child;
+                                        return placeholderImage;
+                                      },
+                                      errorWidget: (context, url, error) =>
+                                          const Icon(Icons.error),
+                                    )
+                                  : Image(
+                                      frameBuilder: ((context, child, frame,
+                                          wasSynchronouslyLoaded) {
+                                        if (wasSynchronouslyLoaded) {
+                                          return child;
+                                        }
 
-                                          _scrollAfterUpload();
-                                          return AnimatedSwitcher(
-                                            duration: const Duration(
-                                                milliseconds: 200),
-                                            child: frame != null
-                                                ? child
-                                                : placeholderImage,
-                                          );
-                                        }),
-                                        image: MemoryImage(
-                                          imageAndCaption.file,
-                                        )),
-                                Container(
-                                    margin: const EdgeInsets.all(5),
-                                    child: InkWell(
-                                        onTap: () {
-                                          widget.fileList!.removeWhere((item) =>
-                                              item.hashCode ==
-                                              imageAndCaption.hashCode);
-                                          widget.notifyParent();
-                                        },
-                                        child: const Icon(
-                                          Icons.cancel,
-                                        )))
-                              ],
-                            )))),
-              ),
-              Container(
-                child: TextField(
-                  onChanged: (value) {
-                    imageAndCaption.caption = value;
-                  },
-                  controller:
-                      TextEditingController(text: imageAndCaption.caption),
-                  key: UniqueKey(),
+                                        _scrollAfterUpload();
+                                        return AnimatedSwitcher(
+                                          duration:
+                                              const Duration(milliseconds: 200),
+                                          child: frame != null
+                                              ? child
+                                              : placeholderImage,
+                                        );
+                                      }),
+                                      image: MemoryImage(
+                                        imageAndCaption.file,
+                                      )),
+                              Container(
+                                  margin: const EdgeInsets.all(5),
+                                  child: InkWell(
+                                      onTap: () {
+                                        widget.fileList!.removeWhere((item) =>
+                                            item.hashCode ==
+                                            imageAndCaption.hashCode);
+                                        widget.notifyParent();
+                                      },
+                                      child: const Icon(
+                                        Icons.cancel,
+                                      )))
+                            ],
+                          )))),
+              TextField(
+                onChanged: (value) {
+                  imageAndCaption.caption = value;
+                },
+                controller:
+                    TextEditingController(text: imageAndCaption.caption),
+                key: UniqueKey(),
 
-                  textAlign: TextAlign.start,
-                  decoration: InputDecoration(
-                      hintText: widget.getText('addCaptionText')),
+                textAlign: TextAlign.start,
+                decoration:
+                    InputDecoration(hintText: widget.getText('addCaptionText')),
 
-                  // controller: _controllers[imageAndCaption.hashCode],
-                  // autofocus: false,
-                  keyboardType: TextInputType.text,
-                ),
+                // controller: _controllers[imageAndCaption.hashCode],
+                // autofocus: false,
+                keyboardType: TextInputType.text,
               )
             ],
           ));
     }
 
     return Form(
-        key: imageFieldFormKey,
+        key: imageFieldTextFormKey,
         child: Expanded(
             child: ScrollablePositionedList.builder(
                 padding: widget.listPadding,
                 // cacheExtent: 9999,
                 scrollDirection: Axis.vertical,
-                physics: ScrollPhysics(),
+                physics: const ScrollPhysics(),
                 shrinkWrap: true,
                 // controller: _scrollController,
                 // key: UniqueKey(),
@@ -573,7 +548,7 @@ class _ImageAndCaptionListWidgetState extends State<ImageAndCaptionListWidget> {
 }
 
 class ImageListActions extends StatefulWidget {
-  ImageListActions(
+  const ImageListActions(
       {super.key,
       this.title,
       this.remoteImage = true,
@@ -589,19 +564,19 @@ class ImageListActions extends StatefulWidget {
       required this.refresh,
       required this.fileList});
 
-  Color? pickerIconColor;
-  Color? pickerBackgroundColor;
-  EdgeInsets listPadding;
-  bool remoteImage;
-  bool multipleUpload;
-  int? cardinality;
-  bool scrollingAfterUpload;
-  List<ImageAndCaptionModel> fileList;
+  final Color? pickerIconColor;
+  final Color? pickerBackgroundColor;
+  final EdgeInsets listPadding;
+  final bool remoteImage;
+  final bool multipleUpload;
+  final int? cardinality;
+  final bool scrollingAfterUpload;
+  final List<ImageAndCaptionModel> fileList;
   final ValueChanged<List<ImageAndCaptionModel>?>? onSave;
   final void Function() refresh;
   final dynamic Function(
       dynamic dataSource,
-      LPI.ControllerLinearProgressIndicator?
+      lpi.ControllerLinearProgressIndicator?
           controllerLinearProgressIndicator)? onUpload;
   final String Function(String) getText;
   final String? title;
@@ -611,20 +586,17 @@ class ImageListActions extends StatefulWidget {
 }
 
 class _ImageListActionsState extends State<ImageListActions> {
-  dynamic _pickImageError;
   bool isLoading = false;
   //Used to stop scrolling down for first page load
   bool pickedFiles = false;
   Uint8List? localFileUploaded;
   double uploadProgressPercentage = 0;
-  String? _retrieveDataError;
-  LPI.ControllerLinearProgressIndicator? controllerLinearProgressIndicator;
-  final List<TextEditingController> _controllers = [];
-  final GlobalKey<FormState> imageFieldFormKey =
-      GlobalKey<FormState>(debugLabel: '__imageField__');
+
+  lpi.ControllerLinearProgressIndicator? controllerLinearProgressIndicator;
+
   @override
   void initState() {
-    controllerLinearProgressIndicator = LPI.ControllerLinearProgressIndicator();
+    controllerLinearProgressIndicator = lpi.ControllerLinearProgressIndicator();
     super.initState();
   }
 
@@ -706,23 +678,17 @@ class _ImageListActionsState extends State<ImageListActions> {
             } finally {}
           }
         } catch (e) {
-          setState(() {
-            _pickImageError = e;
-          });
+          throw Exception(e.toString());
         }
       } else {
         try {
           final XFile? pickedFile = await _picker.pickImage(
             source: source,
-            // maxWidth: maxWidth,
-            // maxHeight: maxHeight,
-            // imageQuality: quality,
           );
           if (pickedFile != null) {
             try {
               setState(() {
                 isLoading = true;
-                // isLocalLoading = true;
               });
               dynamic fileUploaded;
 
@@ -732,7 +698,7 @@ class _ImageListActionsState extends State<ImageListActions> {
                       pickedFile, controllerLinearProgressIndicator);
                 }
               } else {
-                final bytes = await pickedFile!.readAsBytes();
+                final bytes = await pickedFile.readAsBytes();
                 fileUploaded = Uint8List.fromList(bytes);
 
                 if (widget.onUpload != null) {
@@ -748,7 +714,6 @@ class _ImageListActionsState extends State<ImageListActions> {
 
               setState(() {
                 _setFileListFromFileUploaded(fileUploaded);
-                //localFileUploaded = null;
 
                 uploadProgressPercentage = 0;
                 isLoading = false;
@@ -758,9 +723,7 @@ class _ImageListActionsState extends State<ImageListActions> {
             } finally {}
           }
         } catch (e) {
-          setState(() {
-            _pickImageError = e;
-          });
+          throw Exception(e.toString());
         }
       }
     }
@@ -774,17 +737,17 @@ class _ImageListActionsState extends State<ImageListActions> {
   Widget linearProgressIndicatorWidget() {
     return isLoading
         ? Container(
-            padding: EdgeInsets.symmetric(vertical: 10),
-            child: LPI.LinearProgressIndicator(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: lpi.LinearProgressIndicator(
                 width: double.infinity,
                 controllerLinearProgressIndicator:
                     controllerLinearProgressIndicator))
-        : SizedBox.shrink();
+        : const SizedBox.shrink();
   }
 
   Widget headerWidget() {
     bool cardinalityExceeded = (widget.cardinality != null &&
-        widget.cardinality! <= widget.fileList!.length);
+        widget.cardinality! <= widget.fileList.length);
 
     Color? pickerBackgroundColor = widget.pickerBackgroundColor ??
         Theme.of(context).colorScheme.primaryContainer;
@@ -872,11 +835,6 @@ class _ImageListActionsState extends State<ImageListActions> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final AppBarTheme appBarTheme = AppBarTheme.of(context);
-
-    final DefaultTextStyle defaultTextStyle = DefaultTextStyle.of(context);
-
     return WillPopScope(
         onWillPop: () async {
           if (widget.onSave != null) {
@@ -890,14 +848,15 @@ class _ImageListActionsState extends State<ImageListActions> {
             title: Text(widget.getText('titleText')),
             actions: [
               Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 1),
+                  padding: const EdgeInsets.symmetric(horizontal: 1),
                   child: ElevatedButton(
                     style: ButtonStyle(
                       elevation: MaterialStateProperty.all(0),
                       backgroundColor: MaterialStateProperty.resolveWith<Color>(
                         (Set<MaterialState> states) {
-                          if (states.contains(MaterialState.pressed))
+                          if (states.contains(MaterialState.pressed)) {
                             return Colors.transparent;
+                          }
                           return Colors
                               .transparent; // Use the component's default.
                         },
@@ -923,21 +882,19 @@ class _ImageListActionsState extends State<ImageListActions> {
                   ))
             ],
           ),
-          body: Container(
-            child: Column(
-              children: [
-                headerWidget(),
-                linearProgressIndicatorWidget(),
-                ImageAndCaptionListWidget(
-                  listPadding: widget.listPadding,
-                  widget.fileList,
-                  widget.getText,
-                  notifyParent: notifyParent,
-                  remoteImage: widget.remoteImage,
-                  scrollingAfterUpload: widget.scrollingAfterUpload,
-                )
-              ],
-            ),
+          body: Column(
+            children: [
+              headerWidget(),
+              linearProgressIndicatorWidget(),
+              ImageAndCaptionListWidget(
+                listPadding: widget.listPadding,
+                widget.fileList,
+                widget.getText,
+                notifyParent: notifyParent,
+                remoteImage: widget.remoteImage,
+                scrollingAfterUpload: widget.scrollingAfterUpload,
+              )
+            ],
           ),
         ));
   }

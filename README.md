@@ -80,16 +80,15 @@ class _UploadRemoteImageFormState extends State<UploadRemoteImageForm> {
                       'fieldFormText': 'Upload to server',
                       'titleText': 'Upload to server'
                     },
-                    defaultFiles: remoteFiles != null
+                    files: remoteFiles != null
                         ? remoteFiles!.map((image) {
                             return ImageAndCaptionModel(
                                 file: image, caption: image.alt.toString());
                           }).toList()
                         : [],
                     remoteImage: true,
-                    onUpload: (dynamic pickedFile,
-                        ControllerLinearProgressIndicator?
-                            controllerLinearProgressIndicator) async {
+                    onUpload: (pickedFile,
+                                 controllerLinearProgressIndicator) async {
                       dynamic fileUploaded = await uploadToServer(
                         pickedFile,
                         uploadProgress: (percent) {
@@ -171,7 +170,7 @@ class _UploadLocalImageFormState extends State<UploadLocalImageForm> {
 
 | Parameter       | Type    | Description                                                                                                                                        |
 |-----------------|---------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| `defaultFiles`    | List<ImageAndCaptionModel> |Used to add default images on load                                             |  
+| `files`    | List<ImageAndCaptionModel> |Used to add default images on load                                             |  
 | `remoteImage`   | Widget  |  Used for remote upload image, if True should implement onUpload() function   |
 | `texts`   |   Map<String, String>  | key/value variable used for localizations or to override the defaults texts used by the Imagefield.      |
 | `multipleUpload`    | bool  | Enable user to pick multiple files.         |
