@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_field/image_field.dart';
+import 'package:image_field/linear_progress_indicator_if.dart';
+
 import 'package:image_picker/image_picker.dart';
 
 void main() {
@@ -128,8 +130,9 @@ class _MyHomePageState extends State<MyHomePage> {
                           }).toList()
                         : [],
                     remoteImage: true,
-                    onUpload:
-                        (pickedFile, controllerLinearProgressIndicator) async {
+                    onUpload: (dynamic pickedFile,
+                        ControllerLinearProgressIndicatorIF?
+                            controllerLinearProgressIndicator) async {
                       dynamic fileUploaded = await uploadToServer(
                         pickedFile,
                         uploadProgress: (percent) {

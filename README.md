@@ -26,7 +26,6 @@ With Flutter:
 ```
 $ flutter pub add image_field
 ```
-This will add a line like this to you package's pubspec.yaml (and run an implicit `dart pub get`):
  
 2.Implementation
 </br>You can use   ``` ImageField() ```   for upload to a server by following the example below:
@@ -180,7 +179,7 @@ class _UploadLocalImageFormState extends State<UploadLocalImageForm> {
 
 | Function       | Parameter    | Description                                                                                                                                        |
 |-----------------|---------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| `onUpload`    | dynamic Function(dynamic, ControllerLinearProgressIndicator?)? | This function has [dataSource] image that uploaded by a user to send them to the server and [controllerLinearProgressIndicator] used as a reference variable to indicate the uploading progress to the server and return the result to store it in the [fileList] that used in the field.                                             |  
+| `onUpload`    | dynamic Function(dynamic, ControllerLinearProgressIndicatorIF?)? | This function has [dataSource] image that uploaded by a user to send them to the server and [controllerLinearProgressIndicator] used as a reference variable to indicate the uploading progress to the server and return the result to store it in the [fileList] that used in the field.                                             |  
 | `onSave`   | void Function(List<ImageAndCaptionModel>?)?  |  Used to update the form with the uploaded files, it called when back from the listview  |
 | `alterFieldForm`   |   Widget Function(List<ImageAndCaptionModel>?, Widget)?  | It's a hook function used to alter the widget of the field(Thumbnail List) in the form before rendering it      |
 

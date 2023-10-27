@@ -6,7 +6,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:skeletons/skeletons.dart';
-import 'package:image_field/linear_progress_indicator.dart' as lpi;
+import 'linear_progress_indicator_if.dart';
 
 class ImageField extends StatefulWidget {
   const ImageField(
@@ -91,7 +91,7 @@ class ImageField extends StatefulWidget {
 
   ///
   ///This function has [dataSource] image that uploaded by user
-  ///to send them to the server and [controllerLinearProgressIndicator] used as
+  ///to send them to the server and [controllerLinearProgressIndicatorIF] used as
   ///reference variable to indicate the uploading progress to the server and
   ///return the result to store it in the [fileList] that used in the field.
   ///
@@ -100,7 +100,7 @@ class ImageField extends StatefulWidget {
   ///
   final dynamic Function(
       dynamic dataSource,
-      lpi.ControllerLinearProgressIndicator?
+      ControllerLinearProgressIndicatorIF?
           controllerLinearProgressIndicator)? onUpload;
 
   /// It's a hook function used to alter the widget of the field(Thumbnail List)
@@ -374,7 +374,7 @@ class ImageAndCaptionListWidget extends StatefulWidget {
 
 class _ImageAndCaptionListWidgetState extends State<ImageAndCaptionListWidget> {
   bool newItemAdd = false;
-  lpi.ControllerLinearProgressIndicator? controllerLinearProgressIndicator;
+  ControllerLinearProgressIndicatorIF? controllerLinearProgressIndicator;
 
   final GlobalKey<FormState> imageFieldTextFormKey =
       GlobalKey<FormState>(debugLabel: '__ImageFieldText__');
@@ -576,7 +576,7 @@ class ImageListActions extends StatefulWidget {
   final void Function() refresh;
   final dynamic Function(
       dynamic dataSource,
-      lpi.ControllerLinearProgressIndicator?
+      ControllerLinearProgressIndicatorIF?
           controllerLinearProgressIndicator)? onUpload;
   final String Function(String) getText;
   final String? title;
@@ -592,11 +592,11 @@ class _ImageListActionsState extends State<ImageListActions> {
   Uint8List? localFileUploaded;
   double uploadProgressPercentage = 0;
 
-  lpi.ControllerLinearProgressIndicator? controllerLinearProgressIndicator;
+  ControllerLinearProgressIndicatorIF? controllerLinearProgressIndicator;
 
   @override
   void initState() {
-    controllerLinearProgressIndicator = lpi.ControllerLinearProgressIndicator();
+    controllerLinearProgressIndicator = ControllerLinearProgressIndicatorIF();
     super.initState();
   }
 
@@ -738,7 +738,7 @@ class _ImageListActionsState extends State<ImageListActions> {
     return isLoading
         ? Container(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: lpi.LinearProgressIndicator(
+            child: LinearProgressIndicatorIF(
                 width: double.infinity,
                 controllerLinearProgressIndicator:
                     controllerLinearProgressIndicator))

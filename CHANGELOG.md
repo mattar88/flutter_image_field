@@ -21,3 +21,7 @@
 ## 0.0.6
 
 * Improve code
+
+## 0.0.7
+
+* Improve code

@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/material/progress_indicator.dart' as pi;
 
-class ControllerLinearProgressIndicator {
-  late _LinearProgressIndicatorState? _indicatorProgressState;
+class ControllerLinearProgressIndicatorIF {
+  late _LinearProgressIndicatorIFState? _indicatorProgressState;
 
-  ControllerLinearProgressIndicator();
+  ControllerLinearProgressIndicatorIF();
   updateProgress(double uploadProgressPercentage) {
     _indicatorProgressState!._updateProgress(uploadProgressPercentage);
   }
 
-  void _attach(_LinearProgressIndicatorState indicatorProgressState) {
+  void _attach(_LinearProgressIndicatorIFState indicatorProgressState) {
     _indicatorProgressState = indicatorProgressState;
   }
 
@@ -18,20 +17,20 @@ class ControllerLinearProgressIndicator {
   }
 }
 
-class LinearProgressIndicator extends StatefulWidget {
+class LinearProgressIndicatorIF extends StatefulWidget {
   final double width;
 
-  final ControllerLinearProgressIndicator? controllerLinearProgressIndicator;
+  final ControllerLinearProgressIndicatorIF? controllerLinearProgressIndicator;
 
-  const LinearProgressIndicator(
+  const LinearProgressIndicatorIF(
       {required this.width, this.controllerLinearProgressIndicator, super.key});
 
   @override
-  State<LinearProgressIndicator> createState() =>
-      _LinearProgressIndicatorState();
+  State<LinearProgressIndicatorIF> createState() =>
+      _LinearProgressIndicatorIFState();
 }
 
-class _LinearProgressIndicatorState extends State<LinearProgressIndicator> {
+class _LinearProgressIndicatorIFState extends State<LinearProgressIndicatorIF> {
   double percentageProgress = 0;
 
   _updateProgress(double uploadProgressPercentage) {
@@ -58,7 +57,7 @@ class _LinearProgressIndicatorState extends State<LinearProgressIndicator> {
         label: 'uploadProgressBar',
         child: SizedBox(
           width: widget.width,
-          child: pi.LinearProgressIndicator(
+          child: LinearProgressIndicator(
             minHeight: 5,
             value: percentageProgress,
           ),
