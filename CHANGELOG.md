@@ -25,3 +25,8 @@
 ## 0.0.7
 
 * Improve code
+
+## 0.0.8
+
+* Remove not effective plugin cached_network_image.
+* improve code and the plugin become supported with all platforms.

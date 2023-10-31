@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -187,8 +186,10 @@ class _ImageFieldState extends State<ImageField> {
   Widget _previewImages() {
     var placeholderImage = Semantics(
         label: 'image_placeholder',
-        child: const SkeletonAvatar(
+        child: SkeletonAvatar(
             style: SkeletonAvatarStyle(
+          height: widget.thumbnailHeight,
+          width: widget.thumbnailWidth,
           shape: BoxShape.rectangle,
         )));
 
@@ -220,35 +221,25 @@ class _ImageFieldState extends State<ImageField> {
                       ? files!.length - screenMaxCount
                       : -1;
               var img = Semantics(
-                  label: 'image_picker_example_picked_image',
-                  child: widget.remoteImage
-                      ? CachedNetworkImage(
-                          height: widget.thumbnailHeight,
-                          width: widget.thumbnailWidth,
-                          imageUrl: files![i].file.uri.toString(),
-                          fit: BoxFit.cover,
-                          progressIndicatorBuilder:
-                              (context, url, downloadProgress) {
-                            return placeholderImage;
-                          },
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.error),
-                        )
-                      : Image(
-                          height: widget.thumbnailHeight,
-                          width: widget.thumbnailWidth,
-                          fit: BoxFit.cover,
-                          frameBuilder:
-                              ((context, child, frame, wasSynchronouslyLoaded) {
-                            if (wasSynchronouslyLoaded) return child;
-                            return AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 200),
-                              child: frame != null ? child : placeholderImage,
-                            );
-                          }),
-                          image: MemoryImage(
-                            files![i].file,
-                          )));
+                  label: 'image_picker_picked_image',
+                  child: Image(
+                      height: widget.thumbnailHeight,
+                      width: widget.thumbnailWidth,
+                      fit: BoxFit.cover,
+                      frameBuilder:
+                          ((context, child, frame, wasSynchronouslyLoaded) {
+                        if (wasSynchronouslyLoaded) return child;
+                        return AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 200),
+                          child: frame != null ? child : placeholderImage,
+                        );
+                      }),
+                      image: widget.remoteImage
+                          ? NetworkImage(files![i].file.uri.toString())
+                              as ImageProvider
+                          : MemoryImage(
+                              files![i].file,
+                            )));
 
               if (isMore != -1) {
                 listFiles.add(Stack(
@@ -458,39 +449,29 @@ class _ImageAndCaptionListWidgetState extends State<ImageAndCaptionListWidget> {
                           child: Stack(
                             alignment: Alignment.topRight,
                             children: [
-                              widget.remoteImage
-                                  ? CachedNetworkImage(
-                                      imageUrl:
-                                          imageAndCaption.file.uri.toString(),
-                                      fit: BoxFit.cover,
-                                      progressIndicatorBuilder:
-                                          (context, url, downloadProgress) {
-                                        _scrollAfterUpload(reset: true);
+                              Image(
+                                  fit: BoxFit.cover,
+                                  frameBuilder: ((context, child, frame,
+                                      wasSynchronouslyLoaded) {
+                                    if (wasSynchronouslyLoaded) {
+                                      return child;
+                                    }
 
-                                        return placeholderImage;
-                                      },
-                                      errorWidget: (context, url, error) =>
-                                          const Icon(Icons.error),
-                                    )
-                                  : Image(
-                                      frameBuilder: ((context, child, frame,
-                                          wasSynchronouslyLoaded) {
-                                        if (wasSynchronouslyLoaded) {
-                                          return child;
-                                        }
-
-                                        _scrollAfterUpload();
-                                        return AnimatedSwitcher(
-                                          duration:
-                                              const Duration(milliseconds: 200),
-                                          child: frame != null
-                                              ? child
-                                              : placeholderImage,
-                                        );
-                                      }),
-                                      image: MemoryImage(
-                                        imageAndCaption.file,
-                                      )),
+                                    _scrollAfterUpload(reset: true);
+                                    return AnimatedSwitcher(
+                                      duration:
+                                          const Duration(milliseconds: 200),
+                                      child: frame != null
+                                          ? child
+                                          : placeholderImage,
+                                    );
+                                  }),
+                                  image: widget.remoteImage
+                                      ? NetworkImage(imageAndCaption.file.uri
+                                          .toString()) as ImageProvider
+                                      : MemoryImage(
+                                          imageAndCaption.file,
+                                        )),
                               Container(
                                   margin: const EdgeInsets.all(5),
                                   child: InkWell(
