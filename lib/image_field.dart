@@ -25,6 +25,7 @@ class ImageField extends StatefulWidget {
       this.pickerBackgroundColor,
       this.scrollingAfterUpload = true,
       this.multipleUpload = true,
+      this.enabledCaption = true,
       this.cardinality,
       this.onSave,
       this.onUpload,
@@ -83,6 +84,10 @@ class ImageField extends StatefulWidget {
   ///Used for remote upload image
   ///Note: if True should implement onUpload function
   final bool remoteImage;
+
+  ///Allow user to add a caption for a image
+  ///By default enabled
+  final bool enabledCaption;
 
   ///[texts] key/value variable used for localizations and to override
   ///the defaults texts used by the ImageFieldText.
@@ -176,6 +181,7 @@ class _ImageFieldState extends State<ImageField> {
               onUpload: widget.onUpload,
               scrollingAfterUpload: widget.scrollingAfterUpload,
               multipleUpload: widget.multipleUpload,
+              enabledCaption: widget.enabledCaption,
               getText: getText,
               remoteImage: widget.remoteImage,
               cardinality: widget.cardinality,
@@ -345,6 +351,7 @@ class ImageAndCaptionListWidget extends StatefulWidget {
   final String Function(String) getText;
   final bool remoteImage;
   final bool scrollingAfterUpload;
+  final bool enabledCaption;
   final void Function() notifyParent;
   final EdgeInsets listPadding;
 
@@ -355,6 +362,7 @@ class ImageAndCaptionListWidget extends StatefulWidget {
     required this.notifyParent,
     required this.scrollingAfterUpload,
     this.remoteImage = false,
+    this.enabledCaption = true,
     super.key,
   });
 
@@ -486,22 +494,23 @@ class _ImageAndCaptionListWidgetState extends State<ImageAndCaptionListWidget> {
                                       )))
                             ],
                           )))),
-              TextField(
-                onChanged: (value) {
-                  imageAndCaption.caption = value;
-                },
-                controller:
-                    TextEditingController(text: imageAndCaption.caption),
-                key: UniqueKey(),
+              if (widget.enabledCaption)
+                TextField(
+                  onChanged: (value) {
+                    imageAndCaption.caption = value;
+                  },
+                  controller:
+                      TextEditingController(text: imageAndCaption.caption),
+                  key: UniqueKey(),
 
-                textAlign: TextAlign.start,
-                decoration:
-                    InputDecoration(hintText: widget.getText('addCaptionText')),
+                  textAlign: TextAlign.start,
+                  decoration: InputDecoration(
+                      hintText: widget.getText('addCaptionText')),
 
-                // controller: _controllers[imageAndCaption.hashCode],
-                // autofocus: false,
-                keyboardType: TextInputType.text,
-              )
+                  // controller: _controllers[imageAndCaption.hashCode],
+                  // autofocus: false,
+                  keyboardType: TextInputType.text,
+                )
             ],
           ));
     }
@@ -534,6 +543,7 @@ class ImageListActions extends StatefulWidget {
       this.title,
       this.remoteImage = true,
       this.multipleUpload = true,
+      this.enabledCaption = true,
       this.pickerIconColor,
       this.pickerBackgroundColor,
       this.cardinality,
@@ -549,6 +559,7 @@ class ImageListActions extends StatefulWidget {
   final Color? pickerBackgroundColor;
   final EdgeInsets listPadding;
   final bool remoteImage;
+  final bool enabledCaption;
   final bool multipleUpload;
   final int? cardinality;
   final bool scrollingAfterUpload;
@@ -873,6 +884,7 @@ class _ImageListActionsState extends State<ImageListActions> {
                 widget.getText,
                 notifyParent: notifyParent,
                 remoteImage: widget.remoteImage,
+                enabledCaption: widget.enabledCaption,
                 scrollingAfterUpload: widget.scrollingAfterUpload,
               )
             ],

@@ -172,7 +172,8 @@ class _UploadLocalImageFormState extends State<UploadLocalImageForm> {
 | `files`    | List<ImageAndCaptionModel> |Used to add default images on load                                             |  
 | `remoteImage`   | Widget  |  Used for remote upload image, if True should implement onUpload() function   |
 | `texts`   |   Map<String, String>  | key/value variable used for localizations or to override the defaults texts used by the Imagefield.      |
-| `multipleUpload`    | bool  | Enable user to pick multiple files.         |
+| `multipleUpload`    | bool  | Enable user to pick multiple files.  
+| `enabledCaption`    | bool  | Allow user to add a caption for a image.  |
 | `cardinality`            | int  |  Maximum number of files that can be uploaded.    
 
 ### Main Functions

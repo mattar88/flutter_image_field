@@ -1,6 +1,6 @@
 name: image_field
 description: Flutter package enables users to upload and manage images by adding image field to a form.
-version: 0.0.8
+version: 0.0.9
 homepage: https://github.com/mattar88/flutter_image_field
 
 environment:

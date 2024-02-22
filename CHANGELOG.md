@@ -30,3 +30,7 @@
 
 * Remove not effective plugin cached_network_image.
 * improve code and the plugin become supported with all platforms.
+
+## 0.0.9
+
+* Allow user to remove caption of image.
