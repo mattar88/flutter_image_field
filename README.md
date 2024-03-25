@@ -17,7 +17,7 @@ the widget before rendering it and a lot of other features.
 
 
 ## Usage
-1.Install Package
+#### 1.Install Package
 With Dart:
 ```
 $ dart pub add image_field
@@ -26,8 +26,10 @@ With Flutter:
 ```
 $ flutter pub add image_field
 ```
- 
-2.Implementation
+#### 2.Installation
+Please read the Installation of the dependent package [Image Picker](https://pub.dev/packages/image_picker#installation) and do not forget to add the keys in <i>Info.plist</i> for IOS and in <i>AndroidManifest.xml</i> for Android to prevent crash the app when trying to upload or take a photo.
+
+#### 3.Implementation
 </br>You can use   ``` ImageField() ```   for upload to a server by following the example below:
 
 ```
