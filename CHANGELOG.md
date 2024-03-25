@@ -34,3 +34,7 @@
 ## 0.0.9
 
 * Allow user to remove caption of image.
+
+## 0.0.10
+
+* Improve documentation
