@@ -44,3 +44,7 @@
 * Replaced outdated skeleton with skeletonizer
 * added unit tests
 * Upgrade flutter sdk to >=3.0.0
+
+## 0.0.12
+
+* update code and add new release
