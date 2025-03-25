@@ -16,6 +16,7 @@ class ImageField extends StatefulWidget {
       this.thumbnailCount = 3,
       this.width,
       this.height = 90,
+      this.imageQuality = 75,
       this.thumbnailHeight = 90,
       this.thumbnailWidth = 90,
       this.thumbnailAddMoreDecoration,
@@ -60,6 +61,13 @@ class ImageField extends StatefulWidget {
 
   /// Height of the image in the listview
   final double height;
+
+  /// The `imageQuality` argument modifies the quality of the images, ranging from 0-100
+  /// where 100 is the original/max quality. If `imageQuality` is null, the images with
+  /// the original quality will be returned. Compression is only supported for certain
+  /// image types such as JPEG and on Android PNG and WebP, too. If compression is not
+  /// supported for the image that is picked, a warning message will be logged.
+  final int imageQuality;
 
   ///Enable user to pick multiple files
   final bool multipleUpload;
@@ -178,6 +186,7 @@ class _ImageFieldState extends State<ImageField> {
               getText: getText,
               remoteImage: widget.remoteImage,
               cardinality: widget.cardinality,
+              imageQuality: widget.imageQuality,
               refresh: refresh)),
     );
   }
@@ -511,6 +520,7 @@ class ImageListActions extends StatefulWidget {
       this.listPadding = const EdgeInsets.all(0),
       required this.scrollingAfterUpload,
       this.onSave,
+      required this.imageQuality,
       required this.onUpload,
       required this.getText,
       required this.refresh,
@@ -522,6 +532,7 @@ class ImageListActions extends StatefulWidget {
   final bool remoteImage;
   final bool enabledCaption;
   final bool multipleUpload;
+  final int imageQuality;
   final int? cardinality;
   final bool scrollingAfterUpload;
   final List<ImageAndCaptionModel> fileList;
@@ -581,10 +592,10 @@ class _ImageListActionsState extends State<ImageListActions> {
       if (isMultiImage) {
         try {
           final List<XFile> pickedFileList = await _picker.pickMultiImage(
-              // maxWidth: maxWidth,
-              // maxHeight: maxHeight,
-              // imageQuality: quality,
-              );
+            // maxWidth: maxWidth,
+            // maxHeight: maxHeight,
+            imageQuality: widget.imageQuality,
+          );
 
           if (pickedFileList.isNotEmpty) {
             try {
@@ -630,6 +641,7 @@ class _ImageListActionsState extends State<ImageListActions> {
         try {
           final XFile? pickedFile = await _picker.pickImage(
             source: source,
+            imageQuality: widget.imageQuality,
           );
           if (pickedFile != null) {
             try {
