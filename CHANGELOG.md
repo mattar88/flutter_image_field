@@ -38,3 +38,9 @@
 ## 0.0.10
 
 * Improve documentation
+
+## 0.0.11
+
+* Replaced outdated skeleton with skeletonizer
+* added unit tests
+* Upgrade flutter sdk to >=3.0.0
