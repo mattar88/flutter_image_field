@@ -1,29 +1,29 @@
 name: image_field
 description: Flutter package enables users to upload and manage images by adding image field to a form.
-version: 0.0.10
+version: 0.0.11
 homepage: https://github.com/mattar88/flutter_image_field
 
 environment:
-  sdk: '>=2.19.5 <3.0.0'
-  flutter: ">=1.17.0"
+  sdk: '>=3.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
-  skeletons: ^0.0.3
   image_picker: ^1.0.4
   scrollable_positioned_list: ^0.3.8  
+  skeletonizer: ^1.4.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints: ^5.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
 flutter:
+    uses-material-design: true
 
   # To add assets to your package, add an assets section, like this:
   # assets:

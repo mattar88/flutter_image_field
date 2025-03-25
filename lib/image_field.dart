@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-import 'package:skeletons/skeletons.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'linear_progress_indicator_if.dart';
 
 class ImageField extends StatefulWidget {
@@ -102,16 +102,12 @@ class ImageField extends StatefulWidget {
   ///Note: this function can used as hook to alter the [dataSource] not
   ///necessarily for remote upload
   ///
-  final dynamic Function(
-      dynamic dataSource,
-      ControllerLinearProgressIndicatorIF?
-          controllerLinearProgressIndicator)? onUpload;
+  final dynamic Function(dynamic dataSource, ControllerLinearProgressIndicatorIF? controllerLinearProgressIndicator)?
+      onUpload;
 
   /// It's a hook function used to alter the widget of the field(Thumbnail List)
   /// in the form before rendering it
-  final Widget Function(
-          List<ImageAndCaptionModel>? defaultFiles, Widget fieldForm)?
-      alterFieldForm;
+  final Widget Function(List<ImageAndCaptionModel>? defaultFiles, Widget fieldForm)? alterFieldForm;
 
   ///Used to update the form with the uploaded files, it called
   ///when back from the listview
@@ -124,8 +120,7 @@ class ImageField extends StatefulWidget {
 final Map<String, String> defaultTexts = {
   'title': 'Upload Image',
   'imagePickerFromGalleryTooltipText': 'Pick Image from gallery',
-  'multipleImagePickerFromGalleryTooltipText':
-      'Pick Multiple Image from gallery',
+  'multipleImagePickerFromGalleryTooltipText': 'Pick Multiple Image from gallery',
   'takePhotoText': 'Take a photo',
   'addCaptionText': 'Add a caption...',
   'doneText': 'Done',
@@ -141,9 +136,7 @@ class _ImageFieldState extends State<ImageField> {
   void initState() {
     files = widget.files ?? [];
 
-    texts = widget.texts != null
-        ? {...defaultTexts, ...?widget.texts}
-        : defaultTexts;
+    texts = widget.texts != null ? {...defaultTexts, ...?widget.texts} : defaultTexts;
 
     super.initState();
   }
@@ -191,143 +184,124 @@ class _ImageFieldState extends State<ImageField> {
 
   Widget _previewImages() {
     var placeholderImage = Semantics(
-        label: 'image_placeholder',
-        child: SkeletonAvatar(
-            style: SkeletonAvatarStyle(
-          height: widget.thumbnailHeight,
-          width: widget.thumbnailWidth,
-          shape: BoxShape.rectangle,
-        )));
+      label: 'image_placeholder',
+      child: Bone(
+        width: widget.thumbnailWidth,
+        height: widget.thumbnailHeight,
+      ),
+    );
 
     List<Widget> field = [];
     int isMore = 0;
-    bool cardinalityExceeded =
-        (widget.cardinality != null && widget.cardinality! <= files!.length);
+    bool cardinalityExceeded = (widget.cardinality != null && widget.cardinality! <= files!.length);
 
     Color? addMoreIconColor = Theme.of(context).colorScheme.primaryContainer;
 
-    Color? addMoreBackgroundColor =
-        Theme.of(context).colorScheme.onPrimaryContainer;
+    Color? addMoreBackgroundColor = Theme.of(context).colorScheme.onPrimaryContainer;
 
-    return Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (widget.label != null) widget.label!,
-          Expanded(child: LayoutBuilder(builder: (context, constraints) {
-            var width = widget.width;
-            width ??= constraints.constrainWidth();
-            int screenMaxCount = (width / widget.thumbnailWidth).floor();
+    return Row(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.start, children: [
+      if (widget.label != null) widget.label!,
+      Expanded(child: LayoutBuilder(builder: (context, constraints) {
+        var width = widget.width;
+        width ??= constraints.constrainWidth();
+        int screenMaxCount = (width / widget.thumbnailWidth).floor();
 
-            List<Widget> listFiles = [];
-            for (int i = 0; i < files!.length; i++) {
-              bool isLast = i == files!.length - 1;
-              isMore =
-                  i == screenMaxCount - 1 && files!.length >= screenMaxCount
-                      ? files!.length - screenMaxCount
-                      : -1;
-              var img = Semantics(
-                  label: 'image_picker_picked_image',
-                  child: Image(
-                      height: widget.thumbnailHeight,
-                      width: widget.thumbnailWidth,
-                      fit: BoxFit.cover,
-                      frameBuilder:
-                          ((context, child, frame, wasSynchronouslyLoaded) {
-                        if (wasSynchronouslyLoaded) return child;
-                        return AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 200),
-                          child: frame != null ? child : placeholderImage,
-                        );
-                      }),
-                      image: widget.remoteImage
-                          ? NetworkImage(files![i].file.uri.toString())
-                              as ImageProvider
-                          : MemoryImage(
-                              files![i].file,
-                            )));
+        List<Widget> listFiles = [];
+        for (int i = 0; i < files!.length; i++) {
+          bool isLast = i == files!.length - 1;
+          isMore = i == screenMaxCount - 1 && files!.length >= screenMaxCount ? files!.length - screenMaxCount : -1;
+          var img = Semantics(
+              label: 'image_picker_picked_image',
+              child: Image(
+                  height: widget.thumbnailHeight,
+                  width: widget.thumbnailWidth,
+                  fit: BoxFit.cover,
+                  frameBuilder: ((context, child, frame, wasSynchronouslyLoaded) {
+                    if (wasSynchronouslyLoaded) return child;
+                    return AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 200),
+                      child: frame != null ? child : placeholderImage,
+                    );
+                  }),
+                  image: widget.remoteImage
+                      ? NetworkImage(files![i].file.uri.toString()) as ImageProvider
+                      : MemoryImage(
+                          files![i].file,
+                        )));
 
-              if (isMore != -1) {
-                listFiles.add(Stack(
-                  alignment: AlignmentDirectional.center,
-                  children: [
-                    img,
-                    Container(
-                      height: widget.thumbnailHeight,
-                      width: widget.thumbnailWidth,
-                      color: addMoreBackgroundColor.withOpacity(0.6),
-                      child: (isMore != 0)
-                          ? Center(
-                              child: Text(
-                              '+$isMore',
-                              style: TextStyle(
-                                  color: addMoreIconColor,
-                                  fontSize: 26,
-                                  fontWeight: FontWeight.normal),
-                            ))
-                          : Icon(
-                              color: addMoreIconColor,
-                              Icons.add,
-                              size: 40,
-                            ),
-                    ),
-                  ],
-                ));
-                break;
-              } else {
-                listFiles.add(img);
-                if (isLast && !cardinalityExceeded) {
-                  listFiles.add(SizedBox(
-                      height: widget.thumbnailHeight,
-                      width: widget.thumbnailWidth,
-                      child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            shape: const RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(2))),
-                          ),
-                          onPressed: _gotoImageList,
-                          child: Icon(
-                            Icons.add,
-                            size: 40,
-                            color: addMoreIconColor,
-                          ))));
-                }
-              }
-            }
-
-            Widget fieldForm = (files == null || files!.isEmpty)
-                ? SizedBox(
-                    width: constraints.constrainWidth(),
-                    child: ElevatedButton.icon(
+          if (isMore != -1) {
+            listFiles.add(Stack(
+              alignment: AlignmentDirectional.center,
+              children: [
+                img,
+                Container(
+                  height: widget.thumbnailHeight,
+                  width: widget.thumbnailWidth,
+                  color: addMoreBackgroundColor.withOpacity(0.6),
+                  child: (isMore != 0)
+                      ? Center(
+                          child: Text(
+                          '+$isMore',
+                          style: TextStyle(color: addMoreIconColor, fontSize: 26, fontWeight: FontWeight.normal),
+                        ))
+                      : Icon(
+                          color: addMoreIconColor,
+                          Icons.add,
+                          size: 40,
+                        ),
+                ),
+              ],
+            ));
+            break;
+          } else {
+            listFiles.add(img);
+            if (isLast && !cardinalityExceeded) {
+              listFiles.add(SizedBox(
+                  height: widget.thumbnailHeight,
+                  width: widget.thumbnailWidth,
+                  child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(2))),
+                      ),
                       onPressed: _gotoImageList,
-                      icon: const Icon(Icons.upload),
-                      label: Text(getText('fieldFormText')),
-                      style: ElevatedButton.styleFrom(
-                          textStyle: const TextStyle(fontSize: 15),
-                          shape: const RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(12)))),
-                    ),
-                  )
-                : GestureDetector(
-                    onTap: _gotoImageList,
-                    child: SizedBox(
-                        // padding: EdgeInsets.all(5),
-                        width: constraints.constrainWidth(),
-                        height: widget.height,
-                        child: Row(children: listFiles)));
-
-            if (widget.alterFieldForm != null) {
-              fieldForm = widget.alterFieldForm!(files, fieldForm);
+                      child: Icon(
+                        Icons.add,
+                        size: 40,
+                        color: addMoreIconColor,
+                      ))));
             }
+          }
+        }
 
-            field.add(Semantics(
-                label: 'image_picker_picked_images', child: fieldForm));
+        Widget fieldForm = (files == null || files!.isEmpty)
+            ? SizedBox(
+                width: constraints.constrainWidth(),
+                child: ElevatedButton.icon(
+                  onPressed: _gotoImageList,
+                  icon: const Icon(Icons.upload),
+                  label: Text(getText('fieldFormText')),
+                  style: ElevatedButton.styleFrom(
+                      textStyle: const TextStyle(fontSize: 15),
+                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12)))),
+                ),
+              )
+            : GestureDetector(
+                onTap: _gotoImageList,
+                child: SizedBox(
+                    // padding: EdgeInsets.all(5),
+                    width: constraints.constrainWidth(),
+                    height: widget.height,
+                    child: Row(children: listFiles)));
 
-            return Row(children: field);
-          })),
-        ]);
+        if (widget.alterFieldForm != null) {
+          fieldForm = widget.alterFieldForm!(files, fieldForm);
+        }
+
+        field.add(Semantics(label: 'image_picker_picked_images', child: fieldForm));
+
+        return Row(children: field);
+      })),
+    ]);
   }
 
   Widget _handlePreview() {
@@ -367,24 +341,19 @@ class ImageAndCaptionListWidget extends StatefulWidget {
   });
 
   @override
-  State<ImageAndCaptionListWidget> createState() =>
-      _ImageAndCaptionListWidgetState();
+  State<ImageAndCaptionListWidget> createState() => _ImageAndCaptionListWidgetState();
 }
 
 class _ImageAndCaptionListWidgetState extends State<ImageAndCaptionListWidget> {
   bool newItemAdd = false;
   ControllerLinearProgressIndicatorIF? controllerLinearProgressIndicator;
 
-  final GlobalKey<FormState> imageFieldTextFormKey =
-      GlobalKey<FormState>(debugLabel: '__ImageFieldText__');
+  final GlobalKey<FormState> imageFieldTextFormKey = GlobalKey<FormState>(debugLabel: '__ImageFieldText__');
 
   final ItemScrollController itemScrollController = ItemScrollController();
-  final ScrollOffsetController scrollOffsetController =
-      ScrollOffsetController();
-  final ItemPositionsListener itemPositionsListener =
-      ItemPositionsListener.create();
-  final ScrollOffsetListener scrollOffsetListener =
-      ScrollOffsetListener.create();
+  final ScrollOffsetController scrollOffsetController = ScrollOffsetController();
+  final ItemPositionsListener itemPositionsListener = ItemPositionsListener.create();
+  final ScrollOffsetListener scrollOffsetListener = ScrollOffsetListener.create();
 
   int listLength = 0;
 
@@ -435,12 +404,12 @@ class _ImageAndCaptionListWidgetState extends State<ImageAndCaptionListWidget> {
     List<Widget> imgs = [];
 
     Widget? placeholderImage = Semantics(
-        label: 'image_placeholder',
-        child: SkeletonAvatar(
-            style: SkeletonAvatarStyle(
-                shape: BoxShape.rectangle,
-                height: screenWidth * 0.7,
-                width: screenWidth)));
+      label: 'image_placeholder',
+      child: Bone(
+        width: screenWidth,
+        height: screenWidth * 0.7,
+      ),
+    );
 
     for (var imageAndCaption in widget.fileList!) {
       imgs.insert(
@@ -459,24 +428,19 @@ class _ImageAndCaptionListWidgetState extends State<ImageAndCaptionListWidget> {
                             children: [
                               Image(
                                   fit: BoxFit.cover,
-                                  frameBuilder: ((context, child, frame,
-                                      wasSynchronouslyLoaded) {
+                                  frameBuilder: ((context, child, frame, wasSynchronouslyLoaded) {
                                     if (wasSynchronouslyLoaded) {
                                       return child;
                                     }
 
                                     _scrollAfterUpload(reset: true);
                                     return AnimatedSwitcher(
-                                      duration:
-                                          const Duration(milliseconds: 200),
-                                      child: frame != null
-                                          ? child
-                                          : placeholderImage,
+                                      duration: const Duration(milliseconds: 200),
+                                      child: frame != null ? child : placeholderImage,
                                     );
                                   }),
                                   image: widget.remoteImage
-                                      ? NetworkImage(imageAndCaption.file.uri
-                                          .toString()) as ImageProvider
+                                      ? NetworkImage(imageAndCaption.file.uri.toString()) as ImageProvider
                                       : MemoryImage(
                                           imageAndCaption.file,
                                         )),
@@ -484,9 +448,8 @@ class _ImageAndCaptionListWidgetState extends State<ImageAndCaptionListWidget> {
                                   margin: const EdgeInsets.all(5),
                                   child: InkWell(
                                       onTap: () {
-                                        widget.fileList!.removeWhere((item) =>
-                                            item.hashCode ==
-                                            imageAndCaption.hashCode);
+                                        widget.fileList!
+                                            .removeWhere((item) => item.hashCode == imageAndCaption.hashCode);
                                         widget.notifyParent();
                                       },
                                       child: const Icon(
@@ -499,13 +462,11 @@ class _ImageAndCaptionListWidgetState extends State<ImageAndCaptionListWidget> {
                   onChanged: (value) {
                     imageAndCaption.caption = value;
                   },
-                  controller:
-                      TextEditingController(text: imageAndCaption.caption),
+                  controller: TextEditingController(text: imageAndCaption.caption),
                   key: UniqueKey(),
 
                   textAlign: TextAlign.start,
-                  decoration: InputDecoration(
-                      hintText: widget.getText('addCaptionText')),
+                  decoration: InputDecoration(hintText: widget.getText('addCaptionText')),
 
                   // controller: _controllers[imageAndCaption.hashCode],
                   // autofocus: false,
@@ -566,10 +527,8 @@ class ImageListActions extends StatefulWidget {
   final List<ImageAndCaptionModel> fileList;
   final ValueChanged<List<ImageAndCaptionModel>?>? onSave;
   final void Function() refresh;
-  final dynamic Function(
-      dynamic dataSource,
-      ControllerLinearProgressIndicatorIF?
-          controllerLinearProgressIndicator)? onUpload;
+  final dynamic Function(dynamic dataSource, ControllerLinearProgressIndicatorIF? controllerLinearProgressIndicator)?
+      onUpload;
   final String Function(String) getText;
   final String? title;
 
@@ -602,8 +561,7 @@ class _ImageListActionsState extends State<ImageListActions> {
   void _setFileListFromfileListUploaded(dynamic fileListUploaded) {
     pickedFiles = true;
     fileListUploaded.forEach((fileUploaded) {
-      widget.fileList
-          .add(ImageAndCaptionModel(file: fileUploaded, caption: ''));
+      widget.fileList.add(ImageAndCaptionModel(file: fileUploaded, caption: ''));
     });
   }
 
@@ -612,8 +570,7 @@ class _ImageListActionsState extends State<ImageListActions> {
     try {
       widget.fileList.add(ImageAndCaptionModel(file: value, caption: ''));
     } catch (e) {
-      throw Exception(
-          'An error occurred when trying to upload files ${e.toString()}');
+      throw Exception('An error occurred when trying to upload files ${e.toString()}');
     }
   }
 
@@ -639,8 +596,7 @@ class _ImageListActionsState extends State<ImageListActions> {
 
               if (widget.remoteImage) {
                 if (widget.onUpload != null) {
-                  fileListUploaded = await widget.onUpload!(
-                      pickedFileList, controllerLinearProgressIndicator);
+                  fileListUploaded = await widget.onUpload!(pickedFileList, controllerLinearProgressIndicator);
                 }
               } else {
                 for (int i = 0; i < pickedFileList.length; i++) {
@@ -649,11 +605,9 @@ class _ImageListActionsState extends State<ImageListActions> {
                 }
 
                 if (widget.onUpload != null) {
-                  var returnedFileUploaded = await widget.onUpload!(
-                      pickedFileList, controllerLinearProgressIndicator);
+                  var returnedFileUploaded = await widget.onUpload!(pickedFileList, controllerLinearProgressIndicator);
 
-                  if (returnedFileUploaded != null &&
-                      returnedFileUploaded != false) {
+                  if (returnedFileUploaded != null && returnedFileUploaded != false) {
                     fileListUploaded = returnedFileUploaded;
                   }
                 }
@@ -686,19 +640,16 @@ class _ImageListActionsState extends State<ImageListActions> {
 
               if (widget.remoteImage) {
                 if (widget.onUpload != null) {
-                  fileUploaded = await widget.onUpload!(
-                      pickedFile, controllerLinearProgressIndicator);
+                  fileUploaded = await widget.onUpload!(pickedFile, controllerLinearProgressIndicator);
                 }
               } else {
                 final bytes = await pickedFile.readAsBytes();
                 fileUploaded = Uint8List.fromList(bytes);
 
                 if (widget.onUpload != null) {
-                  var returnedFileUploaded = await widget.onUpload!(
-                      pickedFile, controllerLinearProgressIndicator);
+                  var returnedFileUploaded = await widget.onUpload!(pickedFile, controllerLinearProgressIndicator);
 
-                  if (returnedFileUploaded != null &&
-                      returnedFileUploaded != false) {
+                  if (returnedFileUploaded != null && returnedFileUploaded != false) {
                     fileUploaded = returnedFileUploaded;
                   }
                 }
@@ -731,28 +682,19 @@ class _ImageListActionsState extends State<ImageListActions> {
         ? Container(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: LinearProgressIndicatorIF(
-                width: double.infinity,
-                controllerLinearProgressIndicator:
-                    controllerLinearProgressIndicator))
+                width: double.infinity, controllerLinearProgressIndicator: controllerLinearProgressIndicator))
         : const SizedBox.shrink();
   }
 
   Widget headerWidget() {
-    bool cardinalityExceeded = (widget.cardinality != null &&
-        widget.cardinality! <= widget.fileList.length);
+    bool cardinalityExceeded = (widget.cardinality != null && widget.cardinality! <= widget.fileList.length);
 
-    Color? pickerBackgroundColor = widget.pickerBackgroundColor ??
-        Theme.of(context).colorScheme.primaryContainer;
+    Color? pickerBackgroundColor = widget.pickerBackgroundColor ?? Theme.of(context).colorScheme.primaryContainer;
 
-    var bgColor = isLoading || cardinalityExceeded
-        ? pickerBackgroundColor.withOpacity(0.5)
-        : pickerBackgroundColor;
+    var bgColor = isLoading || cardinalityExceeded ? pickerBackgroundColor.withOpacity(0.5) : pickerBackgroundColor;
 
-    Color? iconColor = widget.pickerIconColor ??
-        Theme.of(context).colorScheme.onPrimaryContainer;
-    Color? pickerIconColor = isLoading || cardinalityExceeded
-        ? iconColor.withOpacity(0.5)
-        : iconColor;
+    Color? iconColor = widget.pickerIconColor ?? Theme.of(context).colorScheme.onPrimaryContainer;
+    Color? pickerIconColor = isLoading || cardinalityExceeded ? iconColor.withOpacity(0.5) : iconColor;
 
     // pickerIconColor = null;
     return Padding(
@@ -767,8 +709,7 @@ class _ImageListActionsState extends State<ImageListActions> {
               onPressed: isLoading || cardinalityExceeded
                   ? null
                   : () {
-                      _onImageButtonPressed(ImageSource.gallery,
-                          context: context);
+                      _onImageButtonPressed(ImageSource.gallery, context: context);
                     },
               heroTag: 'image0',
               tooltip: widget.getText('imagePickerFromGalleryTooltipText'),
@@ -793,8 +734,7 @@ class _ImageListActionsState extends State<ImageListActions> {
                         );
                       },
                 heroTag: 'image1',
-                tooltip:
-                    widget.getText('multipleImagePickerFromGalleryTooltipText'),
+                tooltip: widget.getText('multipleImagePickerFromGalleryTooltipText'),
                 child: Icon(
                   Icons.photo_library,
                   color: pickerIconColor,
@@ -808,8 +748,7 @@ class _ImageListActionsState extends State<ImageListActions> {
               onPressed: isLoading || cardinalityExceeded
                   ? null
                   : () {
-                      _onImageButtonPressed(ImageSource.camera,
-                          context: context);
+                      _onImageButtonPressed(ImageSource.camera, context: context);
                     },
               heroTag: 'image2',
               tooltip: widget.getText('takePhotoText'),
@@ -849,8 +788,7 @@ class _ImageListActionsState extends State<ImageListActions> {
                           if (states.contains(MaterialState.pressed)) {
                             return Colors.transparent;
                           }
-                          return Colors
-                              .transparent; // Use the component's default.
+                          return Colors.transparent; // Use the component's default.
                         },
                       ),
                     ),
